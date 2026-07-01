@@ -1,0 +1,4 @@
+interface:
+  display_name: "Skill Developer"
+  short_description: "Create and audit Codex skills"
+  default_prompt: "Use $skill-developer to audit this skill for Codex compatibility."
