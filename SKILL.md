@@ -1,7 +1,7 @@
 ---
 name: skill-developer
 description: |
-  Codex Skill 开发和审核助手，用于创建、改进、验证和开源发布符合 Codex skill 规范的技能包。Use when the user asks to create, update, review, audit, validate, refactor, package, document, or publish a Codex skill; asks about SKILL.md, skill templates, skill structure, skill best practices, trigger descriptions, bundled resources, references, scripts, assets, agents/openai.yaml, README files for GitHub publishing, or skill validation; or wants to check whether an existing skill follows Codex conventions.
+  Codex Skill 开发和审核助手，用于澄清需求、设计、创建、改进、验证和开源发布符合 Codex skill 规范的技能包。Use when the user asks to create, design, update, review, audit, validate, refactor, package, document, or publish a Codex skill; asks about SKILL.md, skill templates, skill design briefs, skill structure, skill best practices, trigger descriptions, bundled resources, references, scripts, assets, agents/openai.yaml, README files for GitHub publishing, or skill validation; or wants to check whether an existing skill follows Codex conventions.
 ---
 
 # Skill 开发助手
@@ -16,18 +16,22 @@ description: |
 | 按需添加资源 | 只有在能减少重复、提高可靠性或承载必要知识时，才添加 `scripts/`、`references/`、`assets/`、`agents/`。 |
 | 禁止空目录 | 不要创建空的目录占位；只在有实际内容时才创建对应目录。空目录不参与 skill 运行，只会造成维护困惑。 |
 | 保持入口轻量 | `SKILL.md` 只放触发、核心流程和资源导航；详细模板、示例、长文档放入 `references/`。 |
+| 设计先行可选 | 需求复杂、模糊或触发边界难判断时，先产出可确认的 skill brief；小型明确任务直接实现。 |
+| 参考发现可选 | 创建复杂、陌生或准备开源的 skill 时，可先轻量查看本地 skills、GitHub 或开源 skill 社区；只提炼结构和模式，不复制大段内容。 |
 | 区分必需和推荐 | 不把项目偏好当成所有 skill 的硬性规范；审核时标明”必须修复””建议优化””项目约定”。 |
 | 区分运行时和发布包装 | Codex 运行时只需要 skill 必需文件；GitHub 开源时可以额外提供 `README.md` 等面向人的仓库文档。 |
 | 验证真实可用 | 创建或大改后运行官方基础校验；复杂 skill 还要用真实请求做前向测试。 |
 
 ## 工作流
 
-1. 明确用户目标：创建新 skill、更新现有 skill、审核规范，或生成模板。
+1. 明确用户目标：创建新 skill、更新现有 skill、审核规范、设计需求，或生成模板。
 2. 读取目标 skill 的 `SKILL.md` 和直接相关资源；不要一次加载无关参考文件。
-3. 根据任务选择对应参考文档。
-4. 区分运行时 skill 包和 GitHub 开源仓库包装；不要把 README、CHANGELOG 等发布材料当成触发或执行资源。
-5. 实施修改时保持文件精简，避免无用 README、CHANGELOG、安装说明等辅助文档。
-6. 运行校验并根据结果修复问题。
+3. 创建或重构复杂、模糊、边界敏感的 skill 时，先读取 `references/design-workflow.md`，产出 skill brief 并与用户确认；小型明确任务跳过 brief。
+4. 创建或重构复杂 skill 时，按需做参考发现：先看本地已有 skills，再视情况检索 GitHub 或开源 skill 社区。
+5. 根据任务选择对应参考文档。
+6. 区分运行时 skill 包、临时设计材料和 GitHub 开源仓库包装；不要把 README、CHANGELOG、设计草案等材料当成触发或执行资源。
+7. 实施修改时保持文件精简，避免无用 README、CHANGELOG、安装说明等辅助文档。
+8. 运行校验并根据结果修复问题。
 
 ## 交互原则
 
@@ -35,6 +39,8 @@ description: |
 |---|---|
 | 信息不足 | 能从上下文合理推断时直接继续；缺少关键决策且推断风险高时，向用户问一个简短问题。 |
 | 创建新 skill | 确认名称、用途、触发场景和是否需要脚本/引用/资产；目录默认放到用户指定路径，未指定时用 `$CODEX_HOME/skills` 或 `~/.codex/skills`。只创建有实际内容的目录，不创建空目录占位。 |
+| 需求设计 | 对复杂或模糊需求，先用 brief 固化目标、触发边界、资源计划和验收标准；确认后再创建或重构 skill。 |
+| 参考开源实现 | 用户要求参考、领域陌生、skill 较复杂或准备开源时，可查本地 skills、GitHub 或开源 skill 社区；网络不可用、用户不希望联网或涉及内部隐私时跳过。 |
 | 审核 skill | 先给必须修复项，再给建议优化项；用文件路径和具体原因说明；发现空目录应建议删除。 |
 | 生成脚本 | 只有需要确定性执行、反复复用或易出错流程时才添加脚本；新增脚本必须实际运行代表性测试。 |
 | 开源发布 | 可以编写面向人的 `README.md`，但不要让 README 替代 `SKILL.md`、`references/` 或校验脚本。 |
@@ -45,7 +51,9 @@ description: |
 - 不把本 skill 当成普通代码生成、业务需求分析或通用项目管理 skill。
 - 不把团队偏好升级为官方硬性规范；只有加载、触发或基本执行会失败的问题才列为“必须修复”。
 - 不为小型 skill 强制创建 `scripts/`、`references/`、`assets/`、配置框架或 README。
+- 不把临时 skill brief、讨论记录或实现计划自动放进最终 skill 包；只有会指导未来运行的稳定内容才转为 `references/`。
 - 不把 GitHub README 作为 Codex 运行时资源；README 只服务开源介绍、安装和贡献说明。
+- 不把开源参考当成必须步骤；不要直接复制大段第三方内容、忽略许可证，或把外部实现当作当前项目规范。
 
 ## 操作路由
 
@@ -53,7 +61,8 @@ description: |
 
 | 目标 | 何时读取 | 文档 |
 |---|---|---|
-| 创建或重构 skill | 用户要新建 skill，或现有 skill 结构需要明显调整 | `references/create-skill.md` |
+| 创建或重构 skill | 用户要新建 skill、现有 skill 结构需要明显调整，或需要参考开源/本地同类 skill | `references/create-skill.md` |
+| 需求澄清和设计 | 用户需求复杂、模糊、需要先敲定方案，或触发边界、资源分层、验收标准还不清楚 | `references/design-workflow.md` |
 | 编写或修正 `SKILL.md` | 需要调整 frontmatter、触发描述、入口正文、资源导航 | `references/skill-md-template.md` |
 | 生成或审核脚本 | 需要 `scripts/`、CLI、配置读取、确定性工具 | `references/script-template.md` |
 | 生成或审核配置 | skill 需要 token、API key、路径、环境变量等配置 | `references/config-template.md` |
@@ -68,7 +77,7 @@ description: |
 创建或修改完成后，运行官方基础校验：
 
 ```bash
-python3 /Users/didi/.codex/skills/.system/skill-creator/scripts/quick_validate.py <skill-folder>
+python3 ${CODEX_HOME:-$HOME/.codex}/skills/.system/skill-creator/scripts/quick_validate.py <skill-folder>
 ```
 
 如果本 skill 的自定义检查脚本适合当前项目，再运行：
@@ -89,4 +98,4 @@ python3 SKILL_DIR/scripts/common/check_skill_structure.py <skill-folder>
 
 ## 输出要求
 
-审核时给出结论、问题清单和建议修改方向。完成修改时说明改了哪些文件、运行了哪些校验、还有哪些残余风险。
+审核时给出结论、问题清单和建议修改方向。创建 brief 时说明保存位置和待确认点。完成修改时说明改了哪些文件、运行了哪些校验、还有哪些残余风险。

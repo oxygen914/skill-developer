@@ -73,6 +73,6 @@ Use the CLI style from `references/script-template.md`: parse arguments, support
 ## 校验
 
 ```bash
-python3 /Users/didi/.codex/skills/.system/skill-creator/scripts/quick_validate.py organize-files
+python3 ${CODEX_HOME:-$HOME/.codex}/skills/.system/skill-creator/scripts/quick_validate.py organize-files
 python3 organize-files/scripts/organize.py --dry-run ./sample-folder
 ```

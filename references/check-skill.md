@@ -12,7 +12,7 @@
 官方基础校验：
 
 ```bash
-python3 /Users/didi/.codex/skills/.system/skill-creator/scripts/quick_validate.py <skill-folder>
+python3 ${CODEX_HOME:-$HOME/.codex}/skills/.system/skill-creator/scripts/quick_validate.py <skill-folder>
 ```
 
 项目增强校验：

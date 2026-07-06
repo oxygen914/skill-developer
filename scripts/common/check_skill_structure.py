@@ -28,10 +28,21 @@ PROJECT_FRONTMATTER_KEYS = {
     "metadata",
 }
 
+# 这些目录属于内部/工具产物，不应作为 skill 运行时内容，空目录检测时跳过。
+IGNORED_DIRS = {
+    ".git",
+    "__pycache__",
+    ".pytest_cache",
+    ".mypy_cache",
+    ".ruff_cache",
+    "node_modules",
+}
+
 
 class SkillChecker:
     def __init__(self, skill_path: str):
-        self.skill_path = Path(skill_path)
+        # resolve() 把 "." 等相对路径转成绝对路径，确保 .name 拿到真实目录名。
+        self.skill_path = Path(skill_path).resolve()
         self.errors: list[str] = []
         self.warnings: list[str] = []
 
@@ -45,6 +56,7 @@ class SkillChecker:
         self._check_agents_metadata()
         self._check_scripts()
         self._check_extraneous_docs()
+        self._check_empty_dirs()
 
         return len(self.errors) == 0, self.errors, self.warnings
 
@@ -209,6 +221,28 @@ class SkillChecker:
             and any(marker in text for marker in skill_markers)
             and any(section in text for section in required_sections)
         )
+
+    def _check_empty_dirs(self) -> None:
+        """检测空目录占位。
+
+        空目录不参与 skill 运行，只造成维护困惑（见 check-skill.md 的“建议优化”）。
+        输出为 warning，不影响 ok。跳过 .git/、缓存等内部目录。
+        """
+        for path in sorted(self.skill_path.rglob("*")):
+            if not path.is_dir() or path.name in IGNORED_DIRS:
+                continue
+            # 跳过被忽略目录内部的子目录（如 .git/objects）
+            if any(part in IGNORED_DIRS for part in path.relative_to(self.skill_path).parts):
+                continue
+            try:
+                has_child = next(path.iterdir(), None) is not None
+            except (PermissionError, OSError):
+                continue
+            if not has_child:
+                rel = path.relative_to(self.skill_path)
+                self.warnings.append(
+                    f"{rel}/: 空目录占位；空目录不参与 skill 运行，建议删除"
+                )
 
 
 def main() -> int:

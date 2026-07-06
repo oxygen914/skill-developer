@@ -51,6 +51,8 @@ description: <一句话说明功能，并包含明确触发场景。Use when ...
 - `Validation`：创建、编辑或执行后需要跑的检查。
 - `Safety`：涉及删除、覆盖、发布、生产变更等操作时的确认规则。
 
+对于包含多类任务的大型 skill，可以用“操作路由”表替代普通 `Resources` 列表，只要明确写出何时读取每个资源。本 skill 的 `SKILL.md` 就采用了这种写法。
+
 不推荐固定强制：
 
 - 每个 skill 都有“初始化检查”。
@@ -72,6 +74,20 @@ description: <一句话说明功能，并包含明确触发场景。Use when ...
 ```yaml
 description: |
   Create and update Codex skills with compliant SKILL.md frontmatter, concise workflows, optional references/scripts/assets, agents/openai.yaml metadata, and validation. Use when the user asks to create, audit, improve, validate, or refactor a skill, or asks about skill templates, trigger descriptions, bundled resources, or skill best practices.
+```
+
+## Prompt 与语言策略
+
+- `description` 影响 skill 触发，优先写清英文触发词；如果目标用户常用中文，可以采用中英双语。
+- `agents/openai.yaml` 的 `default_prompt` 面向 UI 示例，英文通常更通用；面向中文团队内部使用时，也可以写中文或中英双语。
+- `SKILL.md` 正文和 `references/` 可以使用用户或团队主要工作语言，不必为了“看起来标准”强行改英文。
+- 不管使用哪种语言，都要保留关键英文领域词，如 `SKILL.md`、`Use when`、`references/`、`scripts/`、`assets/`、`agents/openai.yaml`。
+
+示例：
+
+```yaml
+description: |
+  PDF 批注和脱敏处理助手。Use when the user asks to redact, annotate, inspect, split, or export PDF files, especially when preserving layout or checking sensitive text.
 ```
 
 ## 资源导航示例
@@ -98,6 +114,6 @@ description: |
 After editing, run:
 
 ```bash
-python3 /Users/didi/.codex/skills/.system/skill-creator/scripts/quick_validate.py <skill-folder>
+python3 ${CODEX_HOME:-$HOME/.codex}/skills/.system/skill-creator/scripts/quick_validate.py <skill-folder>
 ```
 ```
