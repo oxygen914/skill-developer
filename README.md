@@ -1,6 +1,8 @@
-# Skill Developer
+<p align="center">
+  <img alt="Skill Developer" src="assets/skill-developer-title.svg" width="720">
+</p>
 
-![Skill Developer 宣传图](assets/skill-developer-banner.png)
+# Skill Developer
 
 Skill Developer 是一个用于设计、创建、改进、审核、验证和开源发布 Codex Skill 的辅助 skill。它适合把一个模糊的 skill 想法，逐步整理成可触发、可维护、可验证、可发布的标准 skill 包。
 
@@ -75,7 +77,7 @@ skill-developer/
 |-- agents/
 |   `-- openai.yaml
 |-- assets/
-|   `-- skill-developer-banner.png
+|   `-- skill-developer-title.svg
 |-- references/
 |   |-- check-skill.md
 |   |-- common-mistakes.md
@@ -96,7 +98,7 @@ skill-developer/
 
 - `SKILL.md`：Codex 运行时入口，包含触发描述、核心原则、操作路由和校验说明。
 - `agents/openai.yaml`：UI 展示信息。
-- `assets/skill-developer-banner.png`：GitHub README 宣传图。
+- `assets/skill-developer-title.svg`：GitHub README 顶部标题图。
 - `references/design-workflow.md`：复杂或模糊需求的 skill brief 设计流程。
 - `references/create-skill.md`：创建或重构 skill 的完整流程。
 - `references/skill-md-template.md`：`SKILL.md` frontmatter、触发描述、正文结构和资源导航模板。

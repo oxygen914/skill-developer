@@ -1,0 +1,48 @@
+<svg width="900" height="220" viewBox="0 0 900 220" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Skill Developer</title>
+  <desc id="desc">A clean rendered title image for the Skill Developer Codex skill.</desc>
+  <style>
+    .title {
+      font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      font-size: 76px;
+      font-weight: 760;
+      letter-spacing: 0;
+      fill: #111827;
+    }
+    .accent {
+      fill: #2563eb;
+    }
+    .muted {
+      stroke: #d1d5db;
+    }
+    @media (prefers-color-scheme: dark) {
+      .title {
+        fill: #f8fafc;
+      }
+      .accent {
+        fill: #38bdf8;
+      }
+      .muted {
+        stroke: #334155;
+      }
+    }
+  </style>
+  <rect x="1" y="1" width="898" height="218" rx="28" stroke="url(#border)" stroke-width="2"/>
+  <path class="muted" d="M176 154H724" stroke-width="2" stroke-linecap="round"/>
+  <path d="M288 154H612" stroke="url(#underline)" stroke-width="6" stroke-linecap="round"/>
+  <circle class="accent" cx="246" cy="109" r="8"/>
+  <circle class="accent" cx="654" cy="109" r="8"/>
+  <text class="title" x="450" y="126" text-anchor="middle">Skill Developer</text>
+  <defs>
+    <linearGradient id="border" x1="86" y1="32" x2="814" y2="188" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#60a5fa" stop-opacity="0.75"/>
+      <stop offset="0.5" stop-color="#34d399" stop-opacity="0.45"/>
+      <stop offset="1" stop-color="#818cf8" stop-opacity="0.75"/>
+    </linearGradient>
+    <linearGradient id="underline" x1="288" y1="154" x2="612" y2="154" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2563eb"/>
+      <stop offset="0.55" stop-color="#14b8a6"/>
+      <stop offset="1" stop-color="#7c3aed"/>
+    </linearGradient>
+  </defs>
+</svg>
