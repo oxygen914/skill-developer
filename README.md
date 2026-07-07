@@ -1,74 +1,48 @@
 # Skill Developer
 
-Skill Developer is a Codex skill for designing, creating, improving, auditing, validating, and preparing Codex skill packages for open-source release.
+![Skill Developer 宣传图](assets/skill-developer-banner.png)
 
-It helps Codex turn rough skill ideas into maintainable skill packages: first by clarifying what the skill should do, then by deciding which guidance belongs in `SKILL.md`, which details belong in `references/`, which deterministic operations deserve scripts, and which files are only publishing material.
+Skill Developer 是一个用于设计、创建、改进、审核、验证和开源发布 Codex Skill 的辅助 skill。它适合把一个模糊的 skill 想法，逐步整理成可触发、可维护、可验证、可发布的标准 skill 包。
 
-`README.md` is for GitHub and human readers. Codex uses `SKILL.md` as the runtime entry point.
+它的核心价值不是“多生成几个文件”，而是帮你判断：哪些内容应该放进 `SKILL.md`，哪些长规则应该拆到 `references/`，哪些重复或易错流程应该做成 `scripts/`，哪些素材才需要进入 `assets/`，以及哪些 README/发布说明只是面向 GitHub 的包装材料。
 
-## Highlights
+## 适合做什么
 
-- Design new skills from ambiguous requirements with an optional skill brief workflow.
-- Create or refactor skills with valid `SKILL.md` frontmatter and concise runtime instructions.
-- Write trigger descriptions that make skills discoverable without making them overly broad.
-- Decide when to add `references/`, `scripts/`, `assets/`, and `agents/openai.yaml`.
-- Audit skills with clear severity levels: required fixes, recommended improvements, and project conventions.
-- Validate skill packages with the official validator and an optional project-level checker.
-- Prepare a skill repository for GitHub or open-source publishing without confusing README content with runtime instructions.
+- 从模糊需求开始，先设计 skill brief，再确认实现方向。
+- 创建或重构符合 Codex 规范的 skill。
+- 编写更准确的 `description`，让 skill 更容易被正确触发。
+- 判断什么时候需要 `references/`、`scripts/`、`assets/`、`agents/openai.yaml`。
+- 审核现有 skill，并区分“必须修复”“建议优化”“项目约定”。
+- 运行官方基础校验和项目增强检查。
+- 为准备上传 GitHub 的 skill 编写 README 和发布说明。
 
-## Workflow
+## 核心工作流
 
-For small, clear skills, Skill Developer can move directly from requirements to implementation.
+简单明确的 skill，可以直接进入创建或修改。
 
-For complex or ambiguous skills, it uses a design-first workflow:
+复杂、模糊、边界敏感的 skill，建议先走设计流程：
 
-1. Clarify the skill purpose, non-goals, trigger boundaries, and example user requests.
-2. Draft a skill brief outside the final skill package, usually at `.skill-work/<skill-name>/skill-brief.md`.
-3. Confirm the brief with the user before creating or heavily refactoring the skill.
-4. Convert stable runtime guidance into `SKILL.md` and `references/`.
-5. Add scripts or assets only when they reduce repeated work or improve reliability.
-6. Run validation and, for complex skills, forward-test realistic user requests.
+1. 澄清 skill 的用途、非目标、触发边界和典型用户请求。
+2. 生成一份 skill brief，默认保存在 `.skill-work/<skill-name>/skill-brief.md`。
+3. 和用户确认 brief，再开始创建或大改 skill。
+4. 把稳定的运行时规则写入 `SKILL.md` 或 `references/`。
+5. 只有确定性、重复性、易出错的流程才做成 `scripts/`。
+6. 创建或修改完成后运行校验，复杂 skill 再用真实请求做前向测试。
 
-Temporary briefs, discussion notes, and implementation plans should not be copied into the final skill package unless they become stable runtime guidance.
+临时 brief、讨论记录、实现计划不要默认放进最终 skill 包。只有未来运行时也需要读取的稳定知识，才应该转成 `references/`。
 
-## Repository Structure
+## 安装
 
-```text
-skill-developer/
-|-- SKILL.md
-|-- README.md
-|-- agents/
-|   `-- openai.yaml
-|-- references/
-|   |-- check-skill.md
-|   |-- common-mistakes.md
-|   |-- concepts.md
-|   |-- config-template.md
-|   |-- create-skill.md
-|   |-- design-workflow.md
-|   |-- full-example.md
-|   |-- open-source-readme.md
-|   |-- script-template.md
-|   `-- skill-md-template.md
-`-- scripts/
-    `-- common/
-        `-- check_skill_structure.py
-```
-
-## Installation
-
-Clone or copy this folder into your Codex skills directory:
+把本目录复制到 Codex 的 skills 目录：
 
 ```bash
 mkdir -p "${CODEX_HOME:-$HOME/.codex}/skills"
 cp -R skill-developer "${CODEX_HOME:-$HOME/.codex}/skills/"
 ```
 
-After installation, restart or refresh Codex so the skill metadata can be discovered.
+安装后重启或刷新 Codex，让 skill metadata 被重新发现。
 
-## Usage
-
-Ask Codex to use the skill in natural language:
+## 使用示例
 
 ```text
 Use $skill-developer to design a new skill for managing recurring project checklists.
@@ -86,34 +60,70 @@ Use $skill-developer to audit this skill for Codex compatibility.
 Use $skill-developer to improve this SKILL.md and prepare a GitHub README.
 ```
 
-## Reference Files
+中文也可以直接说：
 
-- `references/design-workflow.md`: Design ambiguous or complex skills with a confirmable brief before implementation.
-- `references/create-skill.md`: Create or restructure skills using the official skill creation flow.
-- `references/skill-md-template.md`: Write or repair `SKILL.md` frontmatter, trigger descriptions, workflows, and resource navigation.
-- `references/check-skill.md`: Audit a skill and report required fixes, recommended improvements, and project conventions.
-- `references/common-mistakes.md`: Diagnose common skill design problems.
-- `references/concepts.md`: Explain core Codex skill concepts and progressive disclosure.
-- `references/script-template.md`: Add deterministic CLI scripts with testable behavior.
-- `references/config-template.md`: Design configuration patterns for skills that need tokens, paths, or service settings.
-- `references/full-example.md`: Inspect a complete lightweight example skill.
-- `references/open-source-readme.md`: Prepare README content for GitHub or open-source release.
+```text
+用 $skill-developer 帮我设计一个用于生成周报的 skill，先和我确认需求再创建。
+```
 
-## Validation
+## 仓库结构
 
-Run the official baseline validator:
+```text
+skill-developer/
+|-- SKILL.md
+|-- README.md
+|-- agents/
+|   `-- openai.yaml
+|-- assets/
+|   `-- skill-developer-banner.png
+|-- references/
+|   |-- check-skill.md
+|   |-- common-mistakes.md
+|   |-- concepts.md
+|   |-- config-template.md
+|   |-- create-skill.md
+|   |-- design-workflow.md
+|   |-- full-example.md
+|   |-- open-source-readme.md
+|   |-- script-template.md
+|   `-- skill-md-template.md
+`-- scripts/
+    `-- common/
+        `-- check_skill_structure.py
+```
+
+## 重要文件
+
+- `SKILL.md`：Codex 运行时入口，包含触发描述、核心原则、操作路由和校验说明。
+- `agents/openai.yaml`：UI 展示信息。
+- `assets/skill-developer-banner.png`：GitHub README 宣传图。
+- `references/design-workflow.md`：复杂或模糊需求的 skill brief 设计流程。
+- `references/create-skill.md`：创建或重构 skill 的完整流程。
+- `references/skill-md-template.md`：`SKILL.md` frontmatter、触发描述、正文结构和资源导航模板。
+- `references/check-skill.md`：审核清单和输出格式。
+- `references/common-mistakes.md`：常见问题与修正方式。
+- `references/concepts.md`：Codex skill 核心概念说明。
+- `references/script-template.md`：确定性脚本的 CLI 模板和测试建议。
+- `references/config-template.md`：需要 token、路径或服务配置时的配置模式。
+- `references/full-example.md`：完整轻量示例。
+- `references/open-source-readme.md`：面向 GitHub 开源发布的 README 编写指南。
+- `scripts/common/check_skill_structure.py`：项目增强检查器，用于发现结构和维护性问题。
+
+## 校验
+
+运行官方基础校验：
 
 ```bash
 python3 "${CODEX_HOME:-$HOME/.codex}/skills/.system/skill-creator/scripts/quick_validate.py" .
 ```
 
-Run the optional project-level checker:
+运行项目增强检查：
 
 ```bash
 python3 scripts/common/check_skill_structure.py .
 ```
 
-Expected project-level result:
+期望结果：
 
 ```json
 {
@@ -123,26 +133,24 @@ Expected project-level result:
 }
 ```
 
-## Design Principles
+## 设计原则
 
-- Keep `SKILL.md` small, action-oriented, and focused on runtime behavior.
-- Put long explanations, templates, checklists, and domain details in `references/`.
-- Add scripts only when deterministic execution or repeated automation is useful.
-- Treat `assets/` as output resources, not reading material.
-- Do not create empty directories as placeholders.
-- Separate official Codex requirements from team-specific conventions.
-- Keep design drafts and publishing documentation separate from runtime skill resources.
+- `SKILL.md` 保持轻量，只放触发、核心流程和资源导航。
+- 长规则、模板、示例、检查清单放到 `references/`。
+- 脚本只用于确定性、重复性或易出错的流程。
+- `assets/` 只放真正会被输出或展示使用的素材。
+- 不创建空目录占位。
+- 不把团队偏好误判成官方硬性规范。
+- 不把 GitHub README 当成 Codex 运行时资源。
+- 不把临时设计草案自动打包进最终 skill。
 
-## Contributing
+## GitHub 发布前检查
 
-When changing this skill:
-
-1. Keep trigger conditions in the frontmatter `description`.
-2. Keep resource navigation in `SKILL.md` explicit: say when each reference or script should be used.
-3. Add or update references instead of making `SKILL.md` overly long.
-4. Run both validation commands before opening a pull request.
-5. Do not include real tokens, private URLs, internal account names, personal absolute paths, or unlicensed assets.
+- 确认 README 的目录结构和实际文件一致。
+- 运行官方基础校验和项目增强检查。
+- 确认没有 token、私有 URL、内部账号、个人绝对路径或未授权素材。
+- 如果准备公开发布，补充明确的 `LICENSE` 文件。
 
 ## License
 
-This repository does not include a `LICENSE` file yet. Choose and add an open-source license before publishing publicly on GitHub.
+当前仓库还没有 `LICENSE` 文件。公开发布前建议选择并添加合适的开源许可证。
