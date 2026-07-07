@@ -92,11 +92,10 @@ class SkillChecker:
 
         unexpected = sorted(keys - OFFICIAL_FRONTMATTER_KEYS - PROJECT_FRONTMATTER_KEYS)
         if unexpected:
-            allowed = ", ".join(
-                sorted(OFFICIAL_FRONTMATTER_KEYS | PROJECT_FRONTMATTER_KEYS)
-            )
-            self.errors.append(
-                f"SKILL.md: frontmatter 存在非预期字段 {unexpected}; 允许字段: {allowed}"
+            self.warnings.append(
+                "SKILL.md: frontmatter 包含非官方字段 "
+                f"{unexpected}; 官方基础规范只需要 name 和 description。"
+                "如不影响加载和触发，可作为项目约定保留。"
             )
 
         if "name" not in frontmatter:
