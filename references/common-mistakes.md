@@ -8,7 +8,7 @@
 description: 文件处理工具
 ```
 
-风险：Codex 不知道什么请求应触发这个 skill。
+风险：agent 不知道什么请求应触发这个 skill。
 
 改法：
 
@@ -76,4 +76,4 @@ description: |
 
 GitHub README 面向人类读者，适合写项目介绍、安装、使用示例和贡献方式。
 
-`SKILL.md` 面向 Codex，必须保留触发描述、核心流程、资源导航和校验规则。不要把运行时指令只写进 README。
+`SKILL.md` 面向 agent，必须保留触发描述、核心流程、资源导航和校验规则。不要把运行时指令只写进 README。

@@ -8,10 +8,13 @@
 
 - `name`：小写字母、数字和连字符，建议与目录名一致。
 - `description`：说明 skill 做什么，以及何时触发。
+- 目标平台：通用 Agent Skills、Codex、Claude Code，或多平台兼容。
 - 典型请求：用户会怎样描述这个任务。
 - 资源需求：是否需要 `references/`、`scripts/`、`assets/`。
 - 语言策略：面向全球用户优先英文；面向中文团队可用中文正文，并在 `description` 保留英文触发词或中英双语。
-- 安装位置：未指定时使用 `$CODEX_HOME/skills`，若未设置则使用 `~/.codex/skills`。
+- 安装位置：Codex 使用 `$CODEX_HOME/skills` 或 `~/.codex/skills`；Claude Code 使用 `~/.claude/skills` 或项目 `.claude/skills`。
+
+涉及平台路径、frontmatter 扩展、校验命令或跨平台发布时，先读取 `references/platforms.md`。
 
 如果需求复杂、模糊、触发边界难判断，先读取 `references/design-workflow.md`，用 skill brief 固化目标、边界、资源计划和验收标准。用户确认后再实施。小型明确 skill 可以跳过 brief。
 
@@ -20,6 +23,7 @@
 使用 brief 时，至少确认：
 
 - skill 要解决的核心任务和非目标。
+- 目标平台，以及是否要保持跨平台通用。
 - should trigger / should not trigger 的边界。
 - 3-5 个典型用户请求。
 - 运行时流程和需要读取的资源。
@@ -82,7 +86,7 @@
 - `references/`：用于长流程、领域规则、API 说明、示例、检查清单。
 - `scripts/`：用于确定性操作、重复代码、易出错的流程；新增后必须运行代表性测试。
 - `assets/`：用于输出中会复制或引用的模板、图片、字体、示例项目等。
-- `agents/openai.yaml`：推荐添加，用于 UI 展示；只放面向界面的简短元信息。
+- `agents/openai.yaml`：Codex 发布时推荐添加，用于 OpenAI/Codex UI 展示；Claude Code 不需要。
 
 禁止事项：
 
@@ -91,7 +95,7 @@
 
 ## 5. 编写 SKILL.md
 
-Frontmatter 只需要：
+跨平台默认 frontmatter：
 
 ```yaml
 ---
@@ -113,11 +117,12 @@ description: <what the skill does and when to use it>
 - 把“何时使用本 skill”只写在正文，因为正文只有触发后才加载。
 - 把所有细节堆进 `SKILL.md`。
 - 为每个 skill 强制“初始化检查”“操作路由”“配置管理”等固定章节。
-- 把 GitHub README 当作运行时说明；README 是开源包装，`SKILL.md` 才是 Codex 的入口。
+- 把 GitHub README 当作运行时说明；README 是发布包装，`SKILL.md` 才是 Agent Skill 入口。
+- 默认添加 Claude Code 扩展字段；只有目标平台是 Claude Code，且确实需要手动调用、参数提示、forked context、工具控制等能力时才添加。
 
-## 6. 使用官方初始化脚本
+## 6. 初始化目录
 
-创建全新 skill 时，优先使用官方脚本：
+Codex 专用或 Codex-first skill，优先使用 Codex 官方脚本：
 
 ```bash
 python3 ${CODEX_HOME:-$HOME/.codex}/skills/.system/skill-creator/scripts/init_skill.py <skill-name> --path <output-dir> --resources references,scripts
@@ -125,9 +130,28 @@ python3 ${CODEX_HOME:-$HOME/.codex}/skills/.system/skill-creator/scripts/init_sk
 
 只传实际需要的资源类型。初始化后删除占位内容，补充真实说明和资源。
 
+通用或 Claude Code-first skill，也可以手动创建目录：
+
+```text
+<skill-name>/
+└── SKILL.md
+```
+
+Claude Code 个人级安装路径：
+
+```text
+~/.claude/skills/<skill-name>/SKILL.md
+```
+
+Claude Code 项目级安装路径：
+
+```text
+.claude/skills/<skill-name>/SKILL.md
+```
+
 ## 7. 生成 agents/openai.yaml
 
-推荐使用官方脚本生成 UI 元信息：
+Codex 发布推荐使用官方脚本生成 UI 元信息：
 
 ```bash
 python3 ${CODEX_HOME:-$HOME/.codex}/skills/.system/skill-creator/scripts/generate_openai_yaml.py <skill-folder> \
@@ -136,11 +160,11 @@ python3 ${CODEX_HOME:-$HOME/.codex}/skills/.system/skill-creator/scripts/generat
   --interface default_prompt="Use $<skill-name> to <example task>."
 ```
 
-`default_prompt` 用英文通常更通用；如果 skill 只服务中文团队，也可以使用中文或中英双语。只在用户明确提供或项目需要时添加 icon、brand_color、依赖工具等字段。
+`default_prompt` 用英文通常更通用；如果 skill 只服务中文团队，也可以使用中文或中英双语。只在用户明确提供或项目需要时添加 icon、brand_color、依赖工具等字段。Claude Code 不需要 `agents/openai.yaml`。
 
 ## 8. 校验
 
-基础校验：
+Codex 基础校验：
 
 ```bash
 python3 ${CODEX_HOME:-$HOME/.codex}/skills/.system/skill-creator/scripts/quick_validate.py <skill-folder>
@@ -149,7 +173,13 @@ python3 ${CODEX_HOME:-$HOME/.codex}/skills/.system/skill-creator/scripts/quick_v
 项目增强校验：
 
 ```bash
-python3 <path-to-skill-developer>/scripts/common/check_skill_structure.py <skill-folder>
+python3 <path-to-skill-developer>/scripts/common/check_skill_structure.py <skill-folder> --platform agent
+```
+
+Claude Code 目标 skill 可运行：
+
+```bash
+python3 <path-to-skill-developer>/scripts/common/check_skill_structure.py <skill-folder> --platform claude
 ```
 
 复杂 skill 还要用 2-3 个真实用户请求前向测试：确认能触发、能找到所需引用、能正确执行或说明限制。

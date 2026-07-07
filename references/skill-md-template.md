@@ -10,7 +10,7 @@ description: <一句话说明功能，并包含明确触发场景。Use when ...
 
 # <Skill 标题>
 
-用 1-2 句话说明这个 skill 如何帮助 Codex 完成任务。
+用 1-2 句话说明这个 skill 如何帮助 agent 完成任务。
 
 ## Workflow
 
@@ -26,19 +26,19 @@ description: <一句话说明功能，并包含明确触发场景。Use when ...
 
 ## Frontmatter
 
-必需字段：
+跨平台必需字段：
 
 - `name`：小写字母、数字和连字符；不超过 64 个字符；目录名应与它一致。
 - `description`：说明 skill 做什么，以及用户在什么任务/措辞/上下文中应触发它。
 
 不要把触发条件只写在正文。正文只有触发后才会加载。
 
-可选字段：
+通用可选字段：
 
 - `metadata`：可保留短说明，但不要用它替代 `agents/openai.yaml`。
-- `license`、`allowed-tools`：只有项目明确需要时添加。
+- `license`、`compatibility`、`allowed-tools`：只有项目明确需要时添加。
 
-官方基础规范只依赖 `name` 和 `description`。如果项目允许额外字段，审核时应标成“项目约定”或“兼容性提醒”，不要把额外字段写成所有 skill 都必须采用的做法。
+跨平台默认只依赖 `name` 和 `description`。Claude Code 支持更多扩展字段；Codex 最稳妥的是只使用 `name` 和 `description`。如果项目允许额外字段，审核时应标成“平台约定”或“兼容性提醒”，不要把额外字段写成所有 skill 都必须采用的做法。平台差异见 `references/platforms.md`。
 
 ## 正文结构
 
@@ -73,15 +73,15 @@ description: <一句话说明功能，并包含明确触发场景。Use when ...
 
 ```yaml
 description: |
-  Create and update Codex skills with compliant SKILL.md frontmatter, concise workflows, optional references/scripts/assets, agents/openai.yaml metadata, and validation. Use when the user asks to create, audit, improve, validate, or refactor a skill, or asks about skill templates, trigger descriptions, bundled resources, or skill best practices.
+  Create and update Agent Skills with compliant SKILL.md frontmatter, concise workflows, optional references/scripts/assets, platform-specific metadata, and validation. Use when the user asks to create, audit, improve, validate, or refactor a skill, or asks about skill templates, trigger descriptions, bundled resources, Codex compatibility, Claude Code compatibility, or skill best practices.
 ```
 
 ## Prompt 与语言策略
 
 - `description` 影响 skill 触发，优先写清英文触发词；如果目标用户常用中文，可以采用中英双语。
-- `agents/openai.yaml` 的 `default_prompt` 面向 UI 示例，英文通常更通用；面向中文团队内部使用时，也可以写中文或中英双语。
+- `agents/openai.yaml` 的 `default_prompt` 面向 Codex/OpenAI UI 示例，英文通常更通用；面向中文团队内部使用时，也可以写中文或中英双语。
 - `SKILL.md` 正文和 `references/` 可以使用用户或团队主要工作语言，不必为了“看起来标准”强行改英文。
-- 不管使用哪种语言，都要保留关键英文领域词，如 `SKILL.md`、`Use when`、`references/`、`scripts/`、`assets/`、`agents/openai.yaml`。
+- 不管使用哪种语言，都要保留关键英文领域词，如 `SKILL.md`、`Use when`、`references/`、`scripts/`、`assets/`、`agents/openai.yaml`、`.claude/skills`。
 
 示例：
 

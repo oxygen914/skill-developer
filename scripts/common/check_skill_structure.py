@@ -1,31 +1,60 @@
 #!/usr/bin/env python3
-"""Project-level Codex skill checker.
+"""Project-level Agent Skill checker.
 
-This checker complements the official quick_validate.py. It treats load/trigger
-problems as errors and reports project hygiene items as warnings.
+This checker complements platform-specific validators. It treats load/trigger
+problems as errors and reports portability or project hygiene items as warnings.
 """
 
 from __future__ import annotations
 
+import argparse
 import ast
 import json
 import re
-import sys
 from pathlib import Path
 from typing import Any
 
 import yaml
 
 
-OFFICIAL_FRONTMATTER_KEYS = {
+BASE_FRONTMATTER_KEYS = {
     "name",
     "description",
 }
 
-PROJECT_FRONTMATTER_KEYS = {
+AGENT_SKILLS_FRONTMATTER_KEYS = BASE_FRONTMATTER_KEYS | {
+    "license",
+    "compatibility",
+    "metadata",
+    "allowed-tools",
+}
+
+CODEX_FRONTMATTER_KEYS = BASE_FRONTMATTER_KEYS | {
     "license",
     "allowed-tools",
     "metadata",
+}
+
+CLAUDE_FRONTMATTER_KEYS = AGENT_SKILLS_FRONTMATTER_KEYS | {
+    "when_to_use",
+    "argument-hint",
+    "arguments",
+    "disable-model-invocation",
+    "user-invocable",
+    "disallowed-tools",
+    "model",
+    "effort",
+    "context",
+    "agent",
+    "hooks",
+    "paths",
+    "shell",
+}
+
+PLATFORM_KEYS = {
+    "agent": AGENT_SKILLS_FRONTMATTER_KEYS,
+    "codex": CODEX_FRONTMATTER_KEYS,
+    "claude": CLAUDE_FRONTMATTER_KEYS,
 }
 
 # 这些目录属于内部/工具产物，不应作为 skill 运行时内容，空目录检测时跳过。
@@ -40,9 +69,10 @@ IGNORED_DIRS = {
 
 
 class SkillChecker:
-    def __init__(self, skill_path: str):
+    def __init__(self, skill_path: str, platform: str = "agent"):
         # resolve() 把 "." 等相对路径转成绝对路径，确保 .name 拿到真实目录名。
         self.skill_path = Path(skill_path).resolve()
+        self.platform = platform
         self.errors: list[str] = []
         self.warnings: list[str] = []
 
@@ -83,20 +113,30 @@ class SkillChecker:
             return None, content[match.end() :]
 
         keys = set(frontmatter)
-        project_keys = sorted(keys & PROJECT_FRONTMATTER_KEYS)
-        if project_keys:
+        standard_optional = sorted(
+            keys & (AGENT_SKILLS_FRONTMATTER_KEYS - BASE_FRONTMATTER_KEYS)
+        )
+        if standard_optional:
             self.warnings.append(
-                "SKILL.md: frontmatter 使用了项目扩展字段 "
-                f"{project_keys}; 官方基础规范只需要 name 和 description"
+                "SKILL.md: frontmatter 使用了可选字段 "
+                f"{standard_optional}; 跨平台最小结构只需要 name 和 description"
             )
 
-        unexpected = sorted(keys - OFFICIAL_FRONTMATTER_KEYS - PROJECT_FRONTMATTER_KEYS)
+        allowed_keys = PLATFORM_KEYS[self.platform]
+        unexpected = sorted(keys - allowed_keys)
         if unexpected:
             self.warnings.append(
-                "SKILL.md: frontmatter 包含非官方字段 "
-                f"{unexpected}; 官方基础规范只需要 name 和 description。"
-                "如不影响加载和触发，可作为项目约定保留。"
+                f"SKILL.md: frontmatter 包含 {self.platform} 平台未定义字段 "
+                f"{unexpected}; 如不影响目标平台加载和触发，可作为项目约定保留"
             )
+
+        if self.platform == "codex":
+            codex_extension_keys = sorted(keys - BASE_FRONTMATTER_KEYS)
+            if codex_extension_keys:
+                self.warnings.append(
+                    "SKILL.md: Codex 官方基础校验最稳妥的是只使用 name 和 description；"
+                    f"当前额外字段: {codex_extension_keys}"
+                )
 
         if "name" not in frontmatter:
             self.errors.append("SKILL.md: frontmatter 缺少 name")
@@ -155,7 +195,8 @@ class SkillChecker:
     def _check_agents_metadata(self) -> None:
         agents_file = self.skill_path / "agents" / "openai.yaml"
         if not agents_file.exists():
-            self.warnings.append("建议添加 agents/openai.yaml 作为 UI 元信息")
+            if self.platform == "codex":
+                self.warnings.append("Codex 发布建议添加 agents/openai.yaml 作为 UI 元信息")
             return
 
         try:
@@ -213,7 +254,13 @@ class SkillChecker:
             return False
 
         publish_markers = ("github", "open source", "开源", "repository", "仓库")
-        skill_markers = ("skill.md", "codex skill", "codex")
+        skill_markers = (
+            "skill.md",
+            "agent skill",
+            "codex skill",
+            "claude code",
+            "codex",
+        )
         required_sections = ("install", "安装", "usage", "使用", "validation", "校验")
         return (
             any(marker in text for marker in publish_markers)
@@ -245,12 +292,22 @@ class SkillChecker:
 
 
 def main() -> int:
-    skill_path = sys.argv[1] if len(sys.argv) > 1 else "."
-    checker = SkillChecker(skill_path)
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("skill_path", nargs="?", default=".")
+    parser.add_argument(
+        "--platform",
+        choices=sorted(PLATFORM_KEYS),
+        default="agent",
+        help="Target platform rules to check: agent, codex, or claude.",
+    )
+    args = parser.parse_args()
+
+    checker = SkillChecker(args.skill_path, platform=args.platform)
     ok, errors, warnings = checker.check_all()
     result = {
         "ok": ok,
-        "skill_path": str(Path(skill_path).resolve()),
+        "platform": args.platform,
+        "skill_path": str(Path(args.skill_path).resolve()),
         "errors": errors,
         "warnings": warnings,
     }

@@ -1,6 +1,6 @@
 # Skill 设计工作流
 
-用这个流程把模糊需求转成可实现的 Codex skill。它是可选设计门：复杂、含糊或边界敏感时使用；小型明确任务直接进入 `references/create-skill.md`。
+用这个流程把模糊需求转成可实现的 Agent Skill。它是可选设计门：复杂、含糊或边界敏感时使用；小型明确任务直接进入 `references/create-skill.md`。
 
 ## 何时使用
 
@@ -59,14 +59,14 @@ Should not trigger:
 - 边界或复杂请求怎么说。
 
 ## Runtime Workflow
-Codex 触发后应该按什么步骤工作。
+目标平台触发后应该按什么步骤工作。
 
 ## Resource Plan
 - SKILL.md: 放触发说明、核心流程、资源导航。
 - references/: 放长规则、领域知识、示例、检查清单。
 - scripts/: 放确定性、重复性、易出错操作。
 - assets/: 放输出会复制或引用的模板、图片、字体、示例项目。
-- agents/openai.yaml: 放 UI 展示信息。
+- agents/openai.yaml: Codex/OpenAI UI 展示信息；Claude Code 不需要。
 
 ## Validation Plan
 需要跑哪些校验、脚本测试或真实请求前向测试。
