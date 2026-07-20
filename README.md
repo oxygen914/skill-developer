@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/readme/skill-developer/wordmark.gif" alt="Skill Developer animated wordmark" width="720" />
+  <img src="assets/readme/skill-developer/wordmark.webp" alt="Skill Developer animated wordmark" width="720" />
 </p>
 
 <p align="center">

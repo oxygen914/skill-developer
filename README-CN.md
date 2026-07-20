@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/readme/skill-developer/wordmark.gif" alt="Skill Developer 动态标题" width="720" />
+  <img src="assets/readme/skill-developer/wordmark.webp" alt="Skill Developer 动态标题" width="720" />
 </p>
 
 <p align="center">
