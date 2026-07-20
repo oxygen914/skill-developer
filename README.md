@@ -2,118 +2,283 @@
   <img src="assets/readme/skill-developer/wordmark.gif" alt="Skill Developer animated wordmark" width="720" />
 </p>
 
+<p align="center">
+  <strong>English</strong> · <a href="README-CN.md">简体中文</a>
+</p>
+
 # Skill Developer
 
-面向 Agent Skills、Codex 与 Claude Code 的 Skill 设计与审核助手：把模糊想法整理成可触发、可维护、可验证、可发布的 Skill 包。
+Skill Developer is an Agent Skill for designing, creating, refactoring, auditing, validating, and preparing other skills for publication across Agent Skills-compatible clients, Codex, and Claude Code.
 
-它关注的不只是“生成文件”，而是先明确触发边界与平台差异，再决定规则应进入 `SKILL.md`、`references/`、`scripts/` 还是 `assets/`。运行时规范以 [SKILL.md](SKILL.md) 为准。
+It turns an early idea or an existing skill directory into a package with clearer trigger boundaries, deliberate resource organization, platform-aware metadata, and reproducible validation. The runtime source of truth is [SKILL.md](SKILL.md); this README is the human-facing installation and usage guide.
 
-## 能做什么
+## Why use it?
 
-- 从需求澄清和 Skill brief 开始设计复杂 Skill。
-- 创建、重构或审核跨平台 Agent Skill。
-- 改进 `description`、资源分层和渐进加载结构。
-- 区分 Agent Skills 基础约定、Codex 扩展与 Claude Code 扩展。
-- 运行结构、兼容性与发布前检查，并按严重程度报告问题。
-- 为 GitHub 开源发布准备 README、目录结构和验证说明。
+Creating a useful skill involves more than writing instructions in a Markdown file. A skill also needs to answer:
 
-## 兼容性
+- Which user requests should trigger it, and which should not?
+- What belongs in `SKILL.md`, and what should move into `references/`?
+- Does a repeated or error-prone operation justify a deterministic script?
+- Which files are portable Agent Skills resources, and which are specific to Codex or Claude Code?
+- How should failures, recommendations, and project conventions be distinguished during an audit?
+- Which checks demonstrate that the package can actually be discovered and used?
 
-| 平台 | 安装位置 | 项目支持 |
+Skill Developer makes these decisions explicit before adding structure. Small, well-defined changes can be implemented directly; complex or boundary-sensitive requests can first be captured in a reviewable skill brief.
+
+## Capabilities
+
+- **Design** — define goals, non-goals, target clients, trigger examples, output contracts, risks, and acceptance criteria.
+- **Create and refactor** — build a minimal skill package and add `references/`, `scripts/`, `assets/`, or `agents/` only when they have a concrete purpose.
+- **Improve triggering** — write descriptions that communicate both capability and when the skill should be invoked.
+- **Separate resources** — keep the runtime entry point concise while routing detailed rules, templates, examples, and deterministic tooling to the appropriate files.
+- **Handle platform differences** — separate portable Agent Skills conventions from Codex metadata and Claude Code extensions.
+- **Audit existing skills** — report findings as required fixes, recommended improvements, or project-specific conventions.
+- **Validate** — run Codex's base validator and the bundled cross-platform structural checker.
+- **Prepare for publication** — review repository structure, README content, validation instructions, sensitive data, and license status.
+
+## Supported targets
+
+| Target | Core support | Platform-specific behavior |
 | --- | --- | --- |
-| Agent Skills | 客户端约定的 Skills 目录 | `SKILL.md`、`references/`、`scripts/`、`assets/` |
-| Codex | `${CODEX_HOME:-$HOME/.codex}/skills` | UI 元信息与 Codex 校验 |
-| Claude Code | `~/.claude/skills` 或 `.claude/skills` | 个人级、项目级安装与 `/skill-developer` 调用 |
+| Agent Skills | `SKILL.md` with `name` and `description`; optional `references/`, `scripts/`, and `assets/` | Uses the smallest portable structure by default |
+| Codex | Installation under `${CODEX_HOME:-$HOME/.codex}/skills` | Supports `agents/openai.yaml` and Codex `quick_validate.py` |
+| Claude Code | Personal or project installation under a `.claude/skills` directory | Documents slash-command discovery and clearly labels Claude-only frontmatter extensions |
 
-## 安装
+Platform support does not mean every field is shared. For example, `agents/openai.yaml` controls Codex/OpenAI presentation metadata and is not required by Claude Code. See [Platform compatibility](references/platforms.md) for the detailed boundary.
+
+## How it works
+
+### 1. Understand the request
+
+The skill identifies the target clients, intended users, representative requests, expected output, and important non-goals. It reuses information already available in the conversation or repository instead of asking for it again.
+
+### 2. Decide whether a design brief is needed
+
+A small change—such as fixing a description, adding resource routing, or running validation—can proceed immediately.
+
+A complex, ambiguous, or safety-sensitive skill can first produce:
+
+```text
+.skill-work/<skill-name>/skill-brief.md
+```
+
+The brief records trigger and non-trigger examples, resource plans, dependencies, risks, and acceptance criteria. It stays outside the runtime package unless its content is later converted into stable runtime guidance.
+
+### 3. Build the smallest useful package
+
+The minimum valid package is:
+
+```text
+<skill-name>/
+└── SKILL.md
+```
+
+Additional directories are created only when needed:
+
+```text
+<skill-name>/
+├── SKILL.md
+├── agents/
+│   └── openai.yaml
+├── references/
+│   └── <topic>.md
+├── scripts/
+│   └── <deterministic-tool>
+└── assets/
+    └── <reusable-output-asset>
+```
+
+Empty placeholder directories are intentionally avoided.
+
+### 4. Route knowledge and operations
+
+- `SKILL.md` contains triggering metadata, the core workflow, safety rules, and resource routing.
+- `references/` contains detailed procedures, domain rules, templates, examples, or checklists that are loaded only when relevant.
+- `scripts/` contains deterministic, repeatable, or error-prone operations and should include a clear interface and representative validation.
+- `assets/` contains reusable files consumed or emitted by the skill.
+- `agents/openai.yaml` contains optional Codex/OpenAI UI metadata.
+
+### 5. Validate against the target clients
+
+The skill runs applicable validators, checks direct resource references, inspects script syntax and metadata, and reports remaining unverified behavior instead of treating static inspection as runtime proof.
+
+## Installation
+
+Clone the repository:
+
+```bash
+git clone https://github.com/oxygen914/skill-developer.git
+cd skill-developer
+```
 
 ### Codex
 
 ```bash
 mkdir -p "${CODEX_HOME:-$HOME/.codex}/skills"
-cp -R skill-developer "${CODEX_HOME:-$HOME/.codex}/skills/"
+cp -R . "${CODEX_HOME:-$HOME/.codex}/skills/skill-developer"
 ```
 
 ### Claude Code
 
-个人级安装：
+Personal installation:
 
 ```bash
 mkdir -p ~/.claude/skills
-cp -R skill-developer ~/.claude/skills/
+cp -R . ~/.claude/skills/skill-developer
 ```
 
-项目级安装：
+Project installation:
 
 ```bash
-mkdir -p .claude/skills
-cp -R skill-developer .claude/skills/
+mkdir -p /path/to/project/.claude/skills
+cp -R . /path/to/project/.claude/skills/skill-developer
 ```
 
-安装后刷新或重启对应客户端，使 Skill metadata 被重新发现。
+Refresh or restart the target client after installation so it can rediscover the skill metadata.
 
-## 快速开始
+> These commands copy the repository's publication files as well as its runtime files. If you maintain a packaged distribution, keep `SKILL.md` and every resource it references together.
 
-把目标与平台直接写进请求：
+## Quick start
+
+### Design a cross-platform skill
 
 ```text
-用 $skill-developer 设计一个同时兼容 Codex 和 Claude Code 的周报 Skill，先确认触发边界和资源分层。
+Use $skill-developer to design a cross-platform skill for recurring release
+checklists. Define trigger and non-trigger examples before implementation.
 ```
 
-也可以直接审核现有目录：
+### Create a Codex skill
 
 ```text
-Use $skill-developer to audit this skill for Codex and Claude Code compatibility.
+Use $skill-developer to create a Codex skill that audits API documentation.
+Keep SKILL.md concise, add references only when needed, and validate the result.
 ```
 
-复杂或边界敏感的需求会先形成 Skill brief；明确的小改动会直接实施并验证。
+### Audit an existing skill
 
-## 工作方式
+```text
+Use $skill-developer to audit this skill for Agent Skills, Codex, and Claude
+Code compatibility. Separate required fixes from recommendations.
+```
 
-1. 明确目标平台、用途、非目标和典型触发请求。
-2. 必要时在 `.skill-work/<skill-name>/skill-brief.md` 形成可确认的设计稿。
-3. 保持 `SKILL.md` 轻量，把长规则、模板与示例路由到 `references/`。
-4. 只把确定性、重复性或易错流程实现为 `scripts/`。
-5. 按目标平台校验，并区分“必须修复”“建议优化”“项目约定”。
+### Prepare a repository for GitHub
 
-## 验证
+```text
+Use $skill-developer to review this skill for public release. Check its README,
+resource paths, validation commands, sensitive data, and license status.
+```
 
-在仓库根目录运行：
+In Claude Code, the installed skill can also be invoked explicitly with:
+
+```text
+/skill-developer
+```
+
+## Typical outputs
+
+The exact response depends on the request:
+
+| Request | Typical output |
+| --- | --- |
+| Design | A skill brief with goals, boundaries, triggers, resources, risks, and acceptance criteria |
+| Create or refactor | A minimal runtime package plus the validation results |
+| Audit | A conclusion followed by required fixes, recommended improvements, platform conventions, and verified checks |
+| Publish preparation | A human-facing README review, repository hygiene findings, validation status, and license warning when applicable |
+
+## Audit severity model
+
+Skill Developer deliberately separates three kinds of findings:
+
+| Level | Meaning | Examples |
+| --- | --- | --- |
+| Required fix | Prevents discovery, loading, or basic use on the target client | Missing `SKILL.md`, invalid frontmatter, missing `name` or `description`, broken direct resource reference |
+| Recommended improvement | Does not necessarily break execution but weakens triggering, maintainability, or verification | Overloaded `SKILL.md`, unclear resource routing, an untested script, weak trigger wording |
+| Project convention | Applies only when a client or team has explicitly adopted it | Fixed folder templates, internal configuration patterns, Claude-only frontmatter, optional Codex UI metadata |
+
+This prevents a project preference from being presented as a universal Agent Skills requirement.
+
+## Repository guide
+
+| Path | Purpose |
+| --- | --- |
+| [SKILL.md](SKILL.md) | Runtime entry point, workflow, boundaries, and resource router |
+| [agents/openai.yaml](agents/openai.yaml) | Codex/OpenAI display metadata |
+| [references/design-workflow.md](references/design-workflow.md) | Optional skill-brief workflow for ambiguous or complex requests |
+| [references/create-skill.md](references/create-skill.md) | End-to-end creation and refactoring process |
+| [references/skill-md-template.md](references/skill-md-template.md) | Frontmatter, trigger description, body, and resource-routing guidance |
+| [references/platforms.md](references/platforms.md) | Agent Skills, Codex, and Claude Code differences |
+| [references/check-skill.md](references/check-skill.md) | Audit order, severity levels, and report format |
+| [references/common-mistakes.md](references/common-mistakes.md) | Common triggering, structure, and validation failures |
+| [references/script-template.md](references/script-template.md) | Guidance for deterministic scripts and their CLI contracts |
+| [references/config-template.md](references/config-template.md) | Configuration patterns for paths, environment variables, and credentials |
+| [references/full-example.md](references/full-example.md) | A compact complete skill example |
+| [references/open-source-readme.md](references/open-source-readme.md) | Human-facing README and publication checklist |
+| [scripts/common/check_skill_structure.py](scripts/common/check_skill_structure.py) | Cross-platform structural and maintainability checker |
+
+## Validation
+
+Run the Codex base validator from the repository root:
 
 ```bash
 python3 "${CODEX_HOME:-$HOME/.codex}/skills/.system/skill-creator/scripts/quick_validate.py" .
-python3 scripts/common/check_skill_structure.py . --platform agent
-python3 scripts/common/check_skill_structure.py . --platform claude
-python3 scripts/common/check_skill_structure.py . --platform codex
 ```
 
-增强检查器成功时返回：
+Run the bundled checker for each target:
+
+```bash
+python3 scripts/common/check_skill_structure.py . --platform agent
+python3 scripts/common/check_skill_structure.py . --platform codex
+python3 scripts/common/check_skill_structure.py . --platform claude
+```
+
+A successful bundled check returns:
 
 ```json
 {
   "ok": true,
+  "platform": "agent",
+  "skill_path": "/resolved/path/to/skill-developer",
   "errors": [],
   "warnings": []
 }
 ```
 
-## 仓库导航
+The bundled checker complements platform validators; it does not replace them. For complex skills, validation should also include representative user requests that exercise triggering, reference discovery, and the main workflow.
 
-- [SKILL.md](SKILL.md)：运行时入口、核心原则与资源路由。
-- [平台差异](references/platforms.md)：Agent Skills、Codex 与 Claude Code 的安装和字段边界。
-- [设计工作流](references/design-workflow.md)：复杂需求的 Skill brief 流程。
-- [创建与重构](references/create-skill.md)：从结构设计到验证的完整路径。
-- [审核清单](references/check-skill.md)：问题分级与审核输出格式。
-- [结构检查器](scripts/common/check_skill_structure.py)：跨平台增强检查。
+## Design principles
 
-## 设计边界
+- Prefer a portable Agent Skills foundation before adding client-specific behavior.
+- Keep the runtime entry point concise and progressively load detailed resources.
+- Add files only when they reduce repetition, improve reliability, or carry necessary knowledge.
+- Use scripts for deterministic work, not as a default wrapper around model reasoning.
+- Keep temporary plans and publication documents separate from runtime instructions.
+- Make platform differences explicit rather than implying universal compatibility.
+- Treat validation output as evidence, and label anything not tested.
+- Never copy third-party implementations without reviewing license and attribution requirements.
 
-- 不把团队偏好描述成所有平台的硬性规范。
-- 不创建空目录，也不为简单 Skill 强制增加脚本或配置。
-- 不把 README、临时 brief 和实现计划当作运行时资源。
-- 不把 `agents/openai.yaml` 说成 Claude Code 的必需文件。
-- 不复制未核对许可证的第三方实现。
+## Boundaries
+
+Skill Developer is not a general-purpose code generator, business-requirements analyst, or project-management system. It does not:
+
+- force every skill into one directory template;
+- treat Codex or Claude Code extensions as universal requirements;
+- create empty folders merely to suggest future structure;
+- promote team preferences to required fixes;
+- treat a README or design brief as a runtime instruction source;
+- guarantee that static validation proves every real invocation path;
+- choose a license on behalf of a repository owner.
+
+## Contributing
+
+When proposing a change:
+
+1. Keep `SKILL.md` focused on triggering, the core workflow, and resource routing.
+2. Put detailed reusable guidance in the most relevant file under `references/`.
+3. Add scripts only for deterministic or repeatedly error-prone work.
+4. Update both [README.md](README.md) and [README-CN.md](README-CN.md) when user-facing behavior changes.
+5. Run the Codex validator and all three bundled platform checks.
+6. Include representative forward tests for changes that affect triggering or behavior.
 
 ## License
 
-当前仓库尚未提供 `LICENSE` 文件。公开发布前请先选择并补充合适的开源许可证。
+This repository currently does not include a `LICENSE` file. No open-source license is granted by the repository as it stands. Add an explicit license before distributing or presenting the project as open source.
